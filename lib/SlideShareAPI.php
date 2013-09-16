@@ -1,6 +1,8 @@
 <?php
 
-//класс для работы с slideshare API
+/**
+* @author zhzhussupovkz@gmail.com
+*/
 class SlideShareAPI {
 
 	//api key
