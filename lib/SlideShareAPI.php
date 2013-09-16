@@ -62,7 +62,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshow
 	*/
 	public function getSlideshow($params) {
-		$this->getData('get_slideshow', $params);
+		return $this->getData('get_slideshow', $params);
 	}
 
 	/*
@@ -73,7 +73,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_tag
 	*/
 	public function getSsByTag($params) {
-		$this->getData('get_slideshows_by_tag', $params);
+		return $this->getData('get_slideshows_by_tag', $params);
 	}
 
 	/*
@@ -84,7 +84,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_group
 	*/
 	public function getSsByGroup($params) {
-		$this->getData('get_slideshows_by_group', $params);
+		return $this->getData('get_slideshows_by_group', $params);
 	}
 
 	/*
@@ -97,7 +97,7 @@ class SlideShareAPI {
 	public function getSsByUser($params = array()) {
 		$user = array('username_for' => $this->username);
 		$params = array_merge($user, $params);
-		$this->getData('get_slideshows_by_user', $params);
+		return $this->getData('get_slideshows_by_user', $params);
 	}
 
 	/*
@@ -108,7 +108,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#search_slideshows
 	*/
 	public function searchSlideshows($params) {
-		$this->getData('search_slideshows', $params);
+		return $this->getData('search_slideshows', $params);
 	}
 
 	/*
@@ -118,7 +118,7 @@ class SlideShareAPI {
 	*/
 	public function getUserGroups() {
 		$params = array('username_for' => $this->username);
-		$this->getData('get_user_groups', $params);
+		return $this->getData('get_user_groups', $params);
 	}
 
 	/*
@@ -128,7 +128,7 @@ class SlideShareAPI {
 	*/
 	public function getUserFavorites() {
 		$params = array('username_for' => $this->username);
-		$this->getData('get_user_favorites', $params);
+		return $this->getData('get_user_favorites', $params);
 	}
 
 	/*
@@ -138,7 +138,7 @@ class SlideShareAPI {
 	*/
 	public function getUserContacts($params) {
 		$params = array('username_for' => $this->username);
-		$this->getData('get_user_contacts', $params);
+		return $this->getData('get_user_contacts', $params);
 	}
 
 	// ------------------For all of this methods AUTHORIZATION REQUIRED --------------------
@@ -148,7 +148,7 @@ class SlideShareAPI {
 	* required params: username, password
 	*/
 	public function getUserTags() {
-		$this->getData('get_user_tags', $params = array(), true);
+		return $this->getData('get_user_tags', $params = array(), true);
 	}
 
 	/*
@@ -159,7 +159,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#edit_slideshow
 	*/
 	public function editSlideshow($params) {
-		$this->getData('edit_slideshow', $params, true);
+		return $this->getData('edit_slideshow', $params, true);
 	}
 
 	/*
@@ -170,7 +170,7 @@ class SlideShareAPI {
 	*/
 	public function deleteSlideshow($id) {
 		$params = array('slideshow_id' => $id);
-		$this->getData('delete_slideshow', $params, true);
+		return $this->getData('delete_slideshow', $params, true);
 	}
 
 	/*
@@ -181,7 +181,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#upload_slideshow
 	*/
 	public function uploadSlideshow($params) {
-		$this->getData('upload_slideshow', $params, true);
+		return $this->getData('upload_slideshow', $params, true);
 	}
 
 	/*
@@ -192,7 +192,7 @@ class SlideShareAPI {
 	*/
 	public function addFavoriteSlideshow($id) {
 		$params = array('slideshow_id' => $id);
-		$this->getData('add_favorite', $params, true);
+		return $this->getData('add_favorite', $params, true);
 	}
 
 	/*
@@ -203,7 +203,7 @@ class SlideShareAPI {
 	*/
 	public function checkFavoriteSlideshow($id) {
 		$params = array('slideshow_id' => $id);
-		$this->getData('check_favorite', $params, true);
+		return $this->getData('check_favorite', $params, true);
 	}
 
 	/*
@@ -212,7 +212,7 @@ class SlideShareAPI {
 	* required params: username, password
 	*/
 	public function getUserCampaigns() {
-		$this->getData('get_user_campaigns', $params = array(), true);
+		return $this->getData('get_user_campaigns', $params = array(), true);
 	}
 
 	/*
@@ -223,7 +223,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_user_leads
 	*/
 	public function getUserLeads($params) {
-		$this->getData('get_user_leads', $params, true);
+		return $this->getData('get_user_leads', $params, true);
 	}
 
 	/*
@@ -234,7 +234,7 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#
 	*/
 	public function addUserCampaignLeads($params) {
-		$this->getData('get_user_campaign_leads', $params, true);
+		return $this->getData('get_user_campaign_leads', $params, true);
 	}
 
 }
