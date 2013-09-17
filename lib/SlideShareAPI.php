@@ -21,6 +21,14 @@ class SlideShareAPI {
 	private $password = 'Password';
 
 	/*
+	API uploads are limited to 100 per day per API_Key.
+	*/
+	private $interval = 1800;
+
+	//path to the file
+	private $file = '';
+
+	/*
 	All requests made using the SlideShare API must have the following parameters:
 	api_key,
 	ts,
@@ -39,12 +47,34 @@ class SlideShareAPI {
 				.'&ts='. $ts 
 				.'&hash='. $hash.'&'
 				.$params;
-		try {
-			$result = file_get_contents($fileURL);
-		} catch (Exception $e) {
-			//do something
+
+		if ($this->getFile()) {
+			$tf = filemtime($this->file());
+			if (($ts - $tf) >= $this->interval) {
+				try {
+					file_put_contents($this->file, file_get_contents($fileURL));
+					$result = file_get_contents($this->file);
+				} catch (Exception $e) {
+					//do something
+				}
+			} else {
+				try {
+					$result = file_get_contents($this->file);
+				} catch (Exception $e) {
+					//do something
+				}
+			}
 		}
 		return $this->getSlides($result);
+	}
+
+	//File for writing data
+	private function getFile() {
+		if (file_exists($this->file)) {
+			return $this->file;
+		} else {
+			return false;
+		}
 	}
 
 	/*
