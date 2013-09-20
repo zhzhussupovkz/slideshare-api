@@ -1,4 +1,4 @@
 slideshare-api
 ==============
 
-PHP class for work with SlideShare API 2.0
+Yii extension for work with SlideShare API 2.0
