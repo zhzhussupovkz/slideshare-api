@@ -20,6 +20,9 @@ class SlideShareAPI {
 	//password
 	private $password = 'Password';
 
+	//the format for the returned data
+	private $format = 'array';
+
 	/*
 	API uploads are limited to 100 per day per API_Key.
 	*/
@@ -78,12 +81,31 @@ class SlideShareAPI {
 	}
 
 	/*
-	* return SimpleXMLObject
+	* return SimpleXMLObject or array
+	* For work with SimpleXML
 	* see http://www.php.net/manual/en/book.simplexml.php
 	*/
 	private function getSlides($result) {
-		$ss = new SimpleXMLElement($result);
-		return $ss;
+		switch ($this->format) {
+
+			//return array
+			case 'array':
+				$xml = simplexml_load_string($result);
+				$json = json_encode($xml);
+				$final = json_decode($json, TRUE);
+				break;
+
+			//return SimpleXMLObject
+			case 'object':
+				$final = new SimpleXMLElement($result);
+				break;
+		}
+		return $final;
+	}
+
+	//function for set format
+	public function setDataFormat($format) {
+		$this->format = $format;
 	}
 
 	/*
