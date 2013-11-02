@@ -31,6 +31,7 @@ class SlideShareAPI {
 	//path to the file
 	private $file = '';
 
+
 	/*
 	All requests made using the SlideShare API must have the following parameters:
 	api_key,
@@ -116,6 +117,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshow
 	*/
 	public function getSlideshow($params) {
+		if (!array_key_exists('slideshow', $params) || !array_key_exists('slideshow_url', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshow', $params);
 	}
 
@@ -127,6 +130,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_tag
 	*/
 	public function getSsByTag($params) {
+		if (!array_key_exists('tag_name', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshows_by_tag', $params);
 	}
 
@@ -138,6 +143,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_group
 	*/
 	public function getSsByGroup($params) {
+		if (!array_key_exists('group_name', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshows_by_group', $params);
 	}
 
@@ -162,6 +169,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#search_slideshows
 	*/
 	public function searchSlideshows($params) {
+		if (!array_key_exists('q', $params))
+			return 'Not set the required params';
 		return $this->getData('search_slideshows', $params);
 	}
 
@@ -213,6 +222,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#edit_slideshow
 	*/
 	public function editSlideshow($params) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		return $this->getData('edit_slideshow', $params, true);
 	}
 
@@ -223,6 +234,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function deleteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('delete_slideshow', $params, true);
 	}
@@ -235,6 +248,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#upload_slideshow
 	*/
 	public function uploadSlideshow($params) {
+		if (!array_key_exists('slideshow_title', $params) || !array_key_exists('upload_url', $params))
+			return 'Not set the required params';
 		return $this->getData('upload_slideshow', $params, true);
 	}
 
@@ -245,6 +260,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function addFavoriteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('add_favorite', $params, true);
 	}
@@ -256,6 +273,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function checkFavoriteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('check_favorite', $params, true);
 	}
@@ -288,6 +307,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#
 	*/
 	public function addUserCampaignLeads($params) {
+		if (!array_key_exists('campaign_id', $params))
+			return 'Not set the required params';
 		return $this->getData('get_user_campaign_leads', $params, true);
 	}
 
