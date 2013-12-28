@@ -45,31 +45,35 @@ class SlideShareAPI {
 		if ($auth) {
 			$params = array_merge($user, $params);
 		}
+		$api = array('api_key' => $this->apiKey, 'ts' => $ts, 'hash' => $hash);
+		$params = array_merge($api, $params);
 		$params = http_build_query($params);
 
-		$fileURL = $this->url . $method. '/?api_key='. $this->apiKey 
-				.'&ts='. $ts 
-				.'&hash='. $hash.'&'
-				.$params;
+		$fileURL = $this->url . $method. '/?'.$params;
 
 		if ($this->getFile()) {
 			$tf = filemtime($this->file());
 			if (($ts - $tf) >= $this->interval) {
-				try {
-					file_put_contents($this->file, file_get_contents($fileURL));
-					$result = file_get_contents($this->file);
-				} catch (Exception $e) {
-					//do something
-				}
+				$options = array(
+					CURLOPT_URL => $url,
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_SSL_VERIFYPEER => 0,
+				);
+				$ch = curl_init();
+				curl_setopt_array($ch, $options);
+				$result = curl_exec($ch);
+				if ($result == false)
+					throw new Exception(curl_error($ch));
+				file_put_contents($this->file, $result);
+				curl_close($ch);
+				$final = file_get_contents($this->file);
 			} else {
-				try {
-					$result = file_get_contents($this->file);
-				} catch (Exception $e) {
-					//do something
-				}
+				$final = file_get_contents($this->file);
+				if ($result == false)
+					throw new Exception("Invalid data format");
 			}
 		}
-		return $this->getSlides($result);
+		return $this->getSlides($final);
 	}
 
 	//File for writing data
@@ -101,6 +105,8 @@ class SlideShareAPI {
 				$final = new SimpleXMLElement($result);
 				break;
 		}
+		if (!$final)
+			throw new Exception("Invalid data format");
 		return $final;
 	}
 
