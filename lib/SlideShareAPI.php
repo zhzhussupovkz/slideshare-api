@@ -52,7 +52,7 @@ class SlideShareAPI {
 		$fileURL = $this->url . $method. '/?'.$params;
 
 		if ($this->getFile()) {
-			$tf = filemtime($this->file());
+			$tf = filemtime($this->file);
 			if (($ts - $tf) >= $this->interval) {
 				$options = array(
 					CURLOPT_URL => $url,
