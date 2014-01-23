@@ -20,6 +20,9 @@ class SlideShareAPI {
 	//password
 	private $password = 'Password';
 
+	//the format for the returned data
+	private $format = 'array';
+
 	/*
 	API uploads are limited to 100 per day per API_Key.
 	*/
@@ -27,6 +30,7 @@ class SlideShareAPI {
 
 	//path to the file
 	private $file = '';
+
 
 	/*
 	All requests made using the SlideShare API must have the following parameters:
@@ -41,31 +45,35 @@ class SlideShareAPI {
 		if ($auth) {
 			$params = array_merge($user, $params);
 		}
+		$api = array('api_key' => $this->apiKey, 'ts' => $ts, 'hash' => $hash);
+		$params = array_merge($api, $params);
 		$params = http_build_query($params);
 
-		$fileURL = $this->url . $method. '/?api_key='. $this->apiKey 
-				.'&ts='. $ts 
-				.'&hash='. $hash.'&'
-				.$params;
+		$fileURL = $this->url . $method. '/?'.$params;
 
 		if ($this->getFile()) {
-			$tf = filemtime($this->file());
+			$tf = filemtime($this->file);
 			if (($ts - $tf) >= $this->interval) {
-				try {
-					file_put_contents($this->file, file_get_contents($fileURL));
-					$result = file_get_contents($this->file);
-				} catch (Exception $e) {
-					//do something
-				}
+				$options = array(
+					CURLOPT_URL => $url,
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_SSL_VERIFYPEER => 0,
+				);
+				$ch = curl_init();
+				curl_setopt_array($ch, $options);
+				$result = curl_exec($ch);
+				if ($result == false)
+					throw new Exception(curl_error($ch));
+				file_put_contents($this->file, $result);
+				curl_close($ch);
+				$final = file_get_contents($this->file);
 			} else {
-				try {
-					$result = file_get_contents($this->file);
-				} catch (Exception $e) {
-					//do something
-				}
+				$final = file_get_contents($this->file);
+				if ($result == false)
+					throw new Exception("Invalid data format");
 			}
 		}
-		return $this->getSlides($result);
+		return $this->getSlides($final);
 	}
 
 	//File for writing data
@@ -78,12 +86,66 @@ class SlideShareAPI {
 	}
 
 	/*
-	* return SimpleXMLObject
+	* return SimpleXMLObject or array
+	* For work with SimpleXML
 	* see http://www.php.net/manual/en/book.simplexml.php
 	*/
 	private function getSlides($result) {
-		$ss = new SimpleXMLElement($result);
-		return $ss;
+		switch ($this->format) {
+
+			//return array
+			case 'array':
+				$xml = simplexml_load_string($result);
+				$json = json_encode($xml);
+				$final = json_decode($json, TRUE);
+				break;
+
+			//return SimpleXMLObject
+			case 'object':
+				$final = new SimpleXMLElement($result);
+				break;
+		}
+		if (!$final)
+			throw new Exception("Invalid data format");
+		return $final;
+	}
+
+	//get errors by code
+	private function getError($code) {
+		$errors = array(
+			'0' => 'No API Key Provided',
+			'1' => 'Failed API validation',
+			'2' => 'Failed User authentication',
+			'3' => 'Missing title',
+			'4' => 'Missing file for upload',
+			'5' => 'Blank title',
+			'6' => 'Slideshow file is not a source object',
+			'7' => 'Invalid extension',
+			'8' => 'File size too big',
+			'9' => 'SlideShow Not Found',
+			'10' => 'User Not Found',
+			'11' => 'Group Not Found',
+			'12' => 'No Tag Provided',
+			'13' => 'Tag Not Found',
+			'14' => 'Required Parameter Missing',
+			'15' => 'Search query cannot be blank',
+			'16' => 'Insufficient permissions',
+			'17' => 'Incorrect parameters',
+			'70' => 'Account already linked',
+			'71' => 'No linked account found',
+			'72' => 'User not created',
+			'73' => 'Invalid Application ID',
+			'74' => 'Login already exists',
+			'75' => 'EMail already exists',
+			'99' => 'Account Exceeded Daily Limit',
+			'100' => 'Your Account has been blocked',
+			);
+		return new Exception($this->error[$code]);
+	}
+
+	//function for set format
+	public function setDataFormat($format) {
+		$this->format = $format;
 	}
 
 	/*
@@ -94,6 +156,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshow
 	*/
 	public function getSlideshow($params) {
+		if (!array_key_exists('slideshow', $params) || !array_key_exists('slideshow_url', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshow', $params);
 	}
 
@@ -105,6 +169,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_tag
 	*/
 	public function getSsByTag($params) {
+		if (!array_key_exists('tag_name', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshows_by_tag', $params);
 	}
 
@@ -116,6 +182,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_group
 	*/
 	public function getSsByGroup($params) {
+		if (!array_key_exists('group_name', $params))
+			return 'Not set the required params';
 		return $this->getData('get_slideshows_by_group', $params);
 	}
 
@@ -140,6 +208,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#search_slideshows
 	*/
 	public function searchSlideshows($params) {
+		if (!array_key_exists('q', $params))
+			return 'Not set the required params';
 		return $this->getData('search_slideshows', $params);
 	}
 
@@ -191,6 +261,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#edit_slideshow
 	*/
 	public function editSlideshow($params) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		return $this->getData('edit_slideshow', $params, true);
 	}
 
@@ -201,6 +273,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function deleteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('delete_slideshow', $params, true);
 	}
@@ -213,6 +287,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#upload_slideshow
 	*/
 	public function uploadSlideshow($params) {
+		if (!array_key_exists('slideshow_title', $params) || !array_key_exists('upload_url', $params))
+			return 'Not set the required params';
 		return $this->getData('upload_slideshow', $params, true);
 	}
 
@@ -223,6 +299,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function addFavoriteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('add_favorite', $params, true);
 	}
@@ -234,6 +312,8 @@ class SlideShareAPI {
 	* $id = ss-26156460;
 	*/
 	public function checkFavoriteSlideshow($id) {
+		if (!array_key_exists('slideshow_id', $params))
+			return 'Not set the required params';
 		$params = array('slideshow_id' => $id);
 		return $this->getData('check_favorite', $params, true);
 	}
@@ -266,6 +346,8 @@ class SlideShareAPI {
 	* all params http://www.slideshare.net/developers/documentation#
 	*/
 	public function addUserCampaignLeads($params) {
+		if (!array_key_exists('campaign_id', $params))
+			return 'Not set the required params';
 		return $this->getData('get_user_campaign_leads', $params, true);
 	}
 
