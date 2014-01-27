@@ -32,11 +32,15 @@ class SlideShareAPI {
 	private $file = '';
 
 
-	/*
-	All requests made using the SlideShare API must have the following parameters:
-	api_key,
-	ts,
-	hash
+	/**
+	* All requests made using the SlideShare API must have the following parameters:
+	* api_key,
+	* ts,
+	* hash
+	* @param string $method api method to use
+	* @param array $params params of the api method
+	* @param boolean $auth is the authorization required?
+	* @return $this->getSlides()
 	*/
 	private function getData($method, $params = array(), $auth = false) {
 		$ts = time();
@@ -76,7 +80,9 @@ class SlideShareAPI {
 		return $this->getSlides($final);
 	}
 
-	//File for writing data
+	/**
+	* @return file name if exists
+	*/
 	private function getFile() {
 		if (file_exists($this->file)) {
 			return $this->file;
@@ -85,8 +91,9 @@ class SlideShareAPI {
 		}
 	}
 
-	/*
-	* return SimpleXMLObject or array
+	/**
+	* @param string $result data from api method
+	* @return SimpleXMLObject or array
 	* For work with SimpleXML
 	* see http://www.php.net/manual/en/book.simplexml.php
 	*/
@@ -110,7 +117,11 @@ class SlideShareAPI {
 		return $final;
 	}
 
-	//get errors by code
+	/**
+	* @param string $code is code of error
+	* @return Exception with error description
+	* get errors by code
+	*/
 	private function getError($code) {
 		$errors = array(
 			'0' => 'No API Key Provided',
@@ -143,14 +154,18 @@ class SlideShareAPI {
 		return new Exception($this->error[$code]);
 	}
 
-	//function for set format
+	/**
+	* function for set format
+	* @param string $format set output data format
+	*/
 	public function setDataFormat($format) {
 		$this->format = $format;
 	}
 
-	/*
+	/**
 	* get slideshow
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: slideshow_id, slideshow_url
 	* $params = array('slideshow_id' => 'ID', 'slideshow_url' => 'http://...', ...);
 	* all params http://www.slideshare.net/developers/documentation#get_slideshow
@@ -161,9 +176,10 @@ class SlideShareAPI {
 		return $this->getData('get_slideshow', $params);
 	}
 
-	/*
+	/**
 	* get slideshows_by_tag
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: tag_name
 	* $params = array('tag_name' => 'Tag', 'limit' => 10, 'offset' => 12, 'detailed' => 1 ...);
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_tag
@@ -174,9 +190,10 @@ class SlideShareAPI {
 		return $this->getData('get_slideshows_by_tag', $params);
 	}
 
-	/*
+	/**
 	* get slideshows_by_group
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: group_name
 	* $params = array('group_name' => 'Group', 'limit' => 10, 'offset' => 12, 'detailed' => 1 ...);
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_group
@@ -187,9 +204,10 @@ class SlideShareAPI {
 		return $this->getData('get_slideshows_by_group', $params);
 	}
 
-	/*
+	/**
 	* get slideshows_by_user
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username_for
 	* $params = array('limit' => 10, 'offset' => 12, 'detailed' => 1 ...);
 	* all params http://www.slideshare.net/developers/documentation#get_slideshows_by_user
@@ -200,9 +218,10 @@ class SlideShareAPI {
 		return $this->getData('get_slideshows_by_user', $params);
 	}
 
-	/*
+	/**
 	* search slideshows
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: q
 	* $params = array('q' => 'query string', ...);
 	* all params http://www.slideshare.net/developers/documentation#search_slideshows
@@ -213,9 +232,9 @@ class SlideShareAPI {
 		return $this->getData('search_slideshows', $params);
 	}
 
-	/*
+	/**
 	* get_user_groups
-	* return SimpleXMLObject
+	* @return SimpleXMLObject
 	* required params: username_for
 	*/
 	public function getUserGroups() {
@@ -223,9 +242,9 @@ class SlideShareAPI {
 		return $this->getData('get_user_groups', $params);
 	}
 
-	/*
+	/**
 	* get_user_favorites
-	* return SimpleXMLObject
+	* @return SimpleXMLObject
 	* required params: username_for
 	*/
 	public function getUserFavorites() {
@@ -233,9 +252,10 @@ class SlideShareAPI {
 		return $this->getData('get_user_favorites', $params);
 	}
 
-	/*
+	/**
 	* get_user_contacts
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username_for
 	*/
 	public function getUserContacts($params) {
@@ -244,18 +264,19 @@ class SlideShareAPI {
 	}
 
 	// ------------------For all of this methods AUTHORIZATION REQUIRED --------------------
-	/*
+	/**
 	* get_user_tags
-	* return SimpleXMLObject
+	* @return SimpleXMLObject
 	* required params: username, password
 	*/
 	public function getUserTags() {
 		return $this->getData('get_user_tags', $params = array(), true);
 	}
 
-	/*
+	/**
 	* edit_slideshow
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username, password, slideshow_id
 	* $params = array('slideshow_id' => 'ID', 'slideshow_title' => 'Hello world!'...);
 	* all params http://www.slideshare.net/developers/documentation#edit_slideshow
@@ -266,9 +287,10 @@ class SlideShareAPI {
 		return $this->getData('edit_slideshow', $params, true);
 	}
 
-	/*
+	/**
 	* delete_slideshow
-	* return SimpleXMLObject
+	* @param integer $id slideshow's id
+	* @return SimpleXMLObject
 	* required params: username, password, slideshow_id
 	* $id = ss-26156460;
 	*/
@@ -279,9 +301,10 @@ class SlideShareAPI {
 		return $this->getData('delete_slideshow', $params, true);
 	}
 
-	/*
+	/**
 	* upload_slideshow
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username, password, slideshow_title, upload_url
 	* $params = array('slideshow_title' => 'Title', 'upload_url' => 'http://domain.tld/directory/my_power_point.ppt'...);
 	* all params http://www.slideshare.net/developers/documentation#upload_slideshow
@@ -292,9 +315,10 @@ class SlideShareAPI {
 		return $this->getData('upload_slideshow', $params, true);
 	}
 
-	/*
+	/**
 	* add_favorite
-	* return SimpleXMLObject
+	* @param integer $id slideshow's id
+	* @return SimpleXMLObject
 	* required params: username, password, slideshow_id
 	* $id = ss-26156460;
 	*/
@@ -305,9 +329,10 @@ class SlideShareAPI {
 		return $this->getData('add_favorite', $params, true);
 	}
 
-	/*
+	/**
 	* check_favorite
-	* return SimpleXMLObject
+	* @param integer $id slideshow's id
+	* @return SimpleXMLObject
 	* required params: username, password, slideshow_id
 	* $id = ss-26156460;
 	*/
@@ -318,18 +343,19 @@ class SlideShareAPI {
 		return $this->getData('check_favorite', $params, true);
 	}
 
-	/*
+	/**
 	* get_user_campaigns
-	* return SimpleXMLObject
+	* @return SimpleXMLObject
 	* required params: username, password
 	*/
 	public function getUserCampaigns() {
 		return $this->getData('get_user_campaigns', $params = array(), true);
 	}
 
-	/*
+	/**
 	* get_user_leads
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username, password
 	* $params = array('begin' => 'YYYYMMDDHHMM', 'end' => 'YYYYMMDDHHMM');
 	* all params http://www.slideshare.net/developers/documentation#get_user_leads
@@ -338,9 +364,10 @@ class SlideShareAPI {
 		return $this->getData('get_user_leads', $params, true);
 	}
 
-	/*
+	/**
 	* get_user_campaign_leads
-	* return SimpleXMLObject
+	* @param array $params params of the api method
+	* @return SimpleXMLObject
 	* required params: username, password, campaign_id
 	* $params = array('campaign_id' => 'ID', 'begin' => 'YYYYMMDDHHMM', 'end' => 'YYYYMMDDHHMM');
 	* all params http://www.slideshare.net/developers/documentation#
