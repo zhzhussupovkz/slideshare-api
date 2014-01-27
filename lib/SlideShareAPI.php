@@ -372,7 +372,7 @@ class SlideShareAPI {
 	* $params = array('campaign_id' => 'ID', 'begin' => 'YYYYMMDDHHMM', 'end' => 'YYYYMMDDHHMM');
 	* all params http://www.slideshare.net/developers/documentation#
 	*/
-	public function addUserCampaignLeads($params) {
+	public function getUserCampaignLeads($params) {
 		if (!array_key_exists('campaign_id', $params))
 			return 'Not set the required params';
 		return $this->getData('get_user_campaign_leads', $params, true);
